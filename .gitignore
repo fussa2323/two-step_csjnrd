@@ -1,0 +1,14 @@
+*.txt
+*.cn
+cnsrr/*
+hyp/*
+oldref/*
+out/*
+out_back/*
+ref/*
+test_data/*
+tfidf/*
+utf8_ref/*
+ContextModel/Semmodel
+ContextModel/*.tmp
+NgramModel/Ngrammodel
