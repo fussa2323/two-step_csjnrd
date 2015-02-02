@@ -2,7 +2,7 @@
 
 $cndir = "make_data/new_semantic_cn";
 
-$cncrftrain = "sem_cncrftrain.txt";
+$cncrftrain = "sem_cncrftrain_csjnrd.txt";
 
 opendir(CNDIR,"$cndir");
 @file = readdir(CNDIR);
@@ -16,7 +16,7 @@ foreach(@file){
 	if($_ =~ /.cn/){
 		$cnfile = "$cndir/$_";
 		open(CNDATA,"$cnfile");
-		
+
 		while(<CNDATA>){
 			$line = $_;
 			@cnwords = split(/\t/,$line);
@@ -26,7 +26,7 @@ foreach(@file){
 			if($feature[0] eq "<sil>"){
 				next;
 			}
-			
+
 			if(($feature[6] ne "C") and ($feature[6] ne "E")){
 				print CRF "\n";
 				next;
@@ -54,7 +54,7 @@ foreach(@file){
 	if($_ =~ /.cn/){
 		$cnfile = "$cndir/$_";
 		open(CNDATA,"$cnfile");
-		
+
 		while(<CNDATA>){
 			$line = $_;
 			@cnwords = split(/\t/,$line);
@@ -68,7 +68,7 @@ foreach(@file){
 			if($feature[0] eq "<sil>"){
 				next;
 			}
-			
+
 			if(($feature[6] ne "C") and ($feature[6] ne "E")){
 				print CRF "\n";
 				next;
@@ -96,7 +96,7 @@ foreach(@file){
 	if($_ =~ /.cn/){
 		$cnfile = "$cndir/$_";
 		open(CNDATA,"$cnfile");
-		
+
 		while(<CNDATA>){
 			$line = $_;
 			@cnwords = split(/\t/,$line);
@@ -113,7 +113,7 @@ foreach(@file){
 			if($feature[0] eq "<sil>"){
 				next;
 			}
-			
+
 			if(($feature[6] ne "C") and ($feature[6] ne "E")){
 				print CRF "\n";
 				next;

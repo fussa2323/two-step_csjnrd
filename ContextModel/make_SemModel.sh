@@ -15,4 +15,5 @@ cd make_data
 cd ../
 ./make_traindata.pl
 # ../../CRF_0.57/bin/crf_learn -p 1 SemTemplate.txt sem_cncrftrain.txt Semmodel
-../../CRF_0.57/bin/crf_learn -p 1 SemTemplate.txt sem_cncrftrain.txt Semmodel_csjnrd
+# ../../CRF_0.57/bin/crf_learn -p 1 SemTemplate.txt sem_cncrftrain.txt Semmodel_csjnrd
+../../CRF_0.57/bin/crf_learn -p 1 SemTemplate.txt sem_cncrftrain_csjnrd.txt Semmodel_csjnrd
