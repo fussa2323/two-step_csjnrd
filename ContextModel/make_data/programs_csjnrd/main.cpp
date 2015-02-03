@@ -31,7 +31,7 @@ int main(int argc,char *argv[])
 
     //"word1.txt"の読み込み
 	std::map<std::string, double> word1;
-	FILE *wordfile = fopen ("../tfidf/semantic_score_csjnrd.txt", "r");
+	FILE *wordfile = fopen ("../../tfidf/semantic_score_csjnrd.txt", "r");//ContextModel内からのpass
 	double gsd;
 	char *keyword;
 	while (fgets(buf, sizeof(buf), wordfile)) {
@@ -49,7 +49,7 @@ int main(int argc,char *argv[])
 
 	//"500dic.txt"の読み込み
 	std::map<std::string, int> tag;
-	FILE *dicfile = fopen ("../tfidf/dic.txt", "r");
+	FILE *dicfile = fopen ("../../tfidf/dic.txt", "r");//ContextModel内からのpass
 	int id;
 	char *ivword;
 	while (fgets(buf, sizeof(buf), dicfile)) {
