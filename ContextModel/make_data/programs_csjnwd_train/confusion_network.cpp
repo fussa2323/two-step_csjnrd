@@ -1,4 +1,8 @@
 #include "confusion_network.h"
+#include "main.h"
+using namespace std;
+
+
 
 void confusion_network::display(){
 	for(unsigned int i = 0; i < cn.size(); i++){
@@ -281,7 +285,7 @@ void confusion_network::out_sem_perceptron_data(std::ofstream& ofs){
 	for(int i = 0; i < (int)cn.size(); i++){
 		for(int j = 0; j < (int)cn[i].get_size(); j++){
 			if(cn[i].get_semantic_at(j) != 0){ //変更
-				ofs << cn[i].get_word_at(j) << "/" << cn[i].get_pp_at(j) << "/" << j << "/" << cn[i].get_cos_at(j) << "/" << cn[i].get_semantic_at(j) << "/" << cn[i].get_idf_at(j) << "/" << (cn[i].get_label_at(j) ? "C" : "E") << "\t";
+				ofs << cn[i].get_word_at(j) << "/" << cn[i].get_pp_at(j) << "/" << j << "/" << cn[i].get_cos_at(j) << "/" << cn[i].get_semantic_at(j) << "/"<<"*"<<"/" << (cn[i].get_label_at(j) ? "C" : "E") << "\t";
 			}
 			else{
 				ofs << cn[i].get_word_at(j) << "/" << cn[i].get_pp_at(j) << "/" << j << "/*/*/*/" << (cn[i].get_label_at(j) ? "C" : "E") << "\t";
@@ -302,86 +306,84 @@ void confusion_network::get_context(std::vector<std::string>& context, std::map<
 	}
 }
 
-void confusion_network::semantic_scoring(std::vector<std::string> context, std::vector<double> idf, std::map<std::string, int> tag, std::vector<double> s, std::vector<double *> u){
-	std::string curword,word1,word2;
+void confusion_network::semantic_scoring(int setnum,std::map<std::string,std::string> context, std::map<std::string,double> word1, std::map<std::string, int> tag,std::ofstream& ofs){
+    
+    std::string curword,tempword,tempsetnum;
 	int curtag,tag1,tag2;
 
 	double vs[100];
-
-	double dot;
 	double u1;
 	double u2;
 	double cos;
 	double cursc;
 	double tmpsc;
 	double avgsc;
-
-	for(int i = 0; i < (int)cn.size(); i++){
+    std::string dot=",";
+    for(int i = 0; i < (int)cn.size(); i++){
 		for(int j = 0; j < (int)cn[i].get_size(); j++){
 			avgsc = 0;
 			curword = cn[i].get_word_at(j);
 			if(tag.find(curword) != tag.end()){
-				curtag = tag[curword];
+               
+                // 数字を文字列に変換するための操作
+                stringstream ss1;
+                ss1 << setnum<<","<<i;
+                string setnumcombi=ss1.str();
+            
+                //std::cout<<"current word is "<<curword<<std::endl;
+                map<string,string>::iterator it;
+                map<string,string>::iterator ittemp;
+                map<string,string>::iterator it1;
 
-				//注目単語のSCを求める
-				for(int d = 0; d < 100; d++){
-					vs[d] = 0;
-				}
-				for(int t = 0; t < (int)context.size(); t++){
-					word2 = context[t];
-					tag2 = tag[word2];
-					for(int d = 0; d < 100; d++){
-						vs[d] += u[tag2][d];
-					}
-				}
-				dot = 0;
-				u1 = 0;
-				u2 = 0;
-				for(int d = 0; d < 100; d++){
-					dot += u[curtag][d] * vs[d];
-					u1 += u[curtag][d] * u[curtag][d] * s[d];
-					u2 += vs[d] * vs[d] / s[d];
-				}
-				//SCの計算
-				cursc = dot / (sqrt(u1) * sqrt(u2));
-				avgsc += cursc;	
-				
-				//窓内単語のSCを求める
-				for(int c = 0; c < (int)context.size(); c++){
-					word1 = context[c];
-					tag1 = tag[word1];
 
-					for(int d = 0; d < 100; d++){
-						vs[d] = u[curtag][d];
-					}
-					for(int t = 0; t < (int)context.size(); t++){
-						if(t != c){
-							word2 = context[t];
-							tag2 = tag[word2];
-							for(int d = 0; d < 100; d++){
-								vs[d] += u[tag2][d];
-							}
-						}
-					}
-					dot = 0;
-					u1 = 0;
-					u2 = 0;
-					for(int d = 0; d < 100; d++){
-						dot += u[tag1][d] * vs[d];
-						u1 += u[tag1][d] * u[tag1][d] * s[d];
-						u2 += vs[d] * vs[d] / s[d];
-					}
-					tmpsc = dot / (sqrt(u1) * sqrt(u2));
-					avgsc += tmpsc;	
-				}
-
-				avgsc /= (context.size() + 1);
-
-//				std::cerr << curword << ":" << cursc << ":" << avgsc << std::endl;
-				cn[i].set_cos_at(j,cursc);
-				cn[i].set_semantic_at(j,(cursc - avgsc));
-				cn[i].set_idf_at(j,idf[curtag]);
-			}
+                int flagofoverlap=0;
+                
+                //Erase the ones with in the same cnsets
+                for (it=context.begin();it!=context.end();it++) {
+                    if (setnumcombi==(*it).first){
+                        ittemp=it;
+                        tempsetnum=(*it).first;
+                        tempword=(*it).second;
+                        //cout<<"tempsetnum:tempword"<<tempsetnum<<":"<<tempword<<endl;
+                        context.erase(it);
+                        flagofoverlap=1;
+                       // cout<<"ERASED!!!!"<<endl;
+                    }
+                    
+                    
+                }
+                
+                
+                cursc=0;
+                
+                for(it1=context.begin();it1!=context.end();it1++) {
+                    
+                    //cout<<(*it).first<<"::"<<setnumcombi<<endl;
+                    std::string temp="";
+                    
+                    temp=curword+dot+(*it1).second;
+                    tmpsc=word1[temp];
+                    cursc=cursc+tmpsc;
+                   // cout<<temp<<":"<<tmpsc<<":"<<flagofoverlap<<endl;
+                    
+                }
+                
+                
+                 avgsc=cursc/(double)context.size();
+                
+                cn[i].set_cos_at(j,cursc);
+				cn[i].set_semantic_at(j,avgsc);
+				//cn[i].set_idf_at(j,word1[curtag]);
+			
+            
+                if(flagofoverlap==1){
+                   // context.insert(std::map <std::string, std::string>::value_type(tempsetnum, tempword));
+                   context.insert(std::make_pair(tempsetnum,tempword));
+                   //cout<<"INSERT Complete!"<<endl;
+                }
+            
+            
+            }
 			else{
 				cn[i].set_cos_at(j,NULL);
 				cn[i].set_semantic_at(j,NULL);
@@ -390,66 +392,7 @@ void confusion_network::semantic_scoring(std::vector<std::string> context, std::
 		}
 	}
 
-	/*
-	for(int i = 0; i < (int)cn.size(); i++){
-		for(int j = 0; j < (int)cn[i].get_size(); j++){
-			curword = cn[i].get_word_at(j);
-			if(tag.find(curword) != tag.end()){
-				curtag = tag[curword];
-				cursc = 0;
-				for(int c = 0; c < (int)context.size(); c++){
-					word2 = context[c];
-					tag2 = tag[word2];
-					dot = 0;
-					u1 = 0;
-					u2 = 0;
-					for(int d = 0; d < 100; d++){
-						dot += u[curtag][d] * s[d] * u[tag2][d] * s[d];
-						u1 += u[curtag][d] * s[d] * u[curtag][d] * s[d];
-						u2 += u[tag2][d] * s[d] * u[tag2][d] * s[d];
-					}
-					cos = dot / (sqrt(u1) * sqrt(u2));
-//					std::cerr << word1 << ":" << word2 << ":" << cos << std::endl;
-					cursc += cos;
-				}
-				cursc /= context.size();
-				sumsc = 0;
-				for(int t = 0; t < (int)context.size(); t++){
-					word1 = context[t];
-					tag1 = tag[word1];
-					tmpsc = 0;
-					for(int c = 0; c < (int)context.size(); c++){
-						word2 = context[c];
-						tag2 = tag[word2];
-						dot = 0;
-						u1 = 0;
-						u2 = 0;
-						for(int d = 0; d < 100; d++){
-							dot += u[tag1][d] * s[d] * u[tag2][d] * s[d];
-							u1 += u[tag1][d] * s[d] * u[tag1][d] * s[d];
-							u2 += u[tag2][d] * s[d] * u[tag2][d] * s[d];
-						}
-						cos = dot / (sqrt(u1) * sqrt(u2));
-//						std::cerr << word1 << ":" << word2 << ":" << cos << std::endl;
-						tmpsc += cos;
-					}
-					tmpsc /= (int)context.size();
-					sumsc += tmpsc;
-				}
-				sumsc /= (int)context.size();
-				
-				std::cerr << curword << ":" << (cursc - sumsc) << ":" << idf[curtag] <<":" << context.size() << std::endl;
-				cn[i].set_semantic_at(j,(cursc - sumsc));
-				cn[i].set_idf_at(j,idf[curtag]);
-			}
-			else{
-				cn[i].set_semantic_at(j,NULL);
-				cn[i].set_idf_at(j,NULL);
-			}
-		}
-//		std::cerr << std::endl;
-	}
-	*/
+	
 }
 
 void confusion_network::culc_weight(std::map<std::string,double>& feature_list,std::vector<std::vector<std::vector<int> > > templ){

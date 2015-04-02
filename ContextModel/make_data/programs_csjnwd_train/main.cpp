@@ -5,6 +5,7 @@
 #define ALPHA 10
 using namespace std;
 
+
 int main(int argc,char *argv[])
 {
 	//宣言
@@ -31,7 +32,7 @@ int main(int argc,char *argv[])
 
     //"word1.txt"の読み込み
 	std::map<std::string, double> word1;
-	FILE *wordfile = fopen ("../../tfidf/semantic_score_csjnrd.txt", "r");//ContextModel内からのpass
+	FILE *wordfile = fopen ("../../tfidf/word1_hypertrain.txt", "r");
 	double gsd;
 	char *keyword;
 	while (fgets(buf, sizeof(buf), wordfile)) {
@@ -42,14 +43,14 @@ int main(int argc,char *argv[])
 
 	}
 	fclose(wordfile);
-	fprintf(stderr,"semantic_score_csjnrd.txt read\n");
+	fprintf(stderr,"word1_hypertrain.txt read\n");
 
 
 
 
 	//"500dic.txt"の読み込み
 	std::map<std::string, int> tag;
-	FILE *dicfile = fopen ("../../tfidf/dic.txt", "r");//ContextModel内からのpass
+	FILE *dicfile = fopen ("../../tfidf/dic.txt", "r");
 	int id;
 	char *ivword;
 	while (fgets(buf, sizeof(buf), dicfile)) {

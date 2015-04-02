@@ -3,6 +3,8 @@
 #define DIM 100
 #define WINDOW_SIZE 10
 #define ALPHA 10
+using namespace std;
+
 
 int main(int argc,char *argv[])
 {
@@ -12,18 +14,41 @@ int main(int argc,char *argv[])
 
 	fprintf(stderr,"Data reading...\n");
 
-	//"entropy.txt"の読み込み
-	std::vector<double> idf;
-	FILE *entfile = fopen ("../../tfidf/entropy.txt", "r");
-	while (fgets(buf, sizeof(buf), entfile)) {
-		char *ptr = buf;
-		idf.push_back(atof(ptr));
+	/*//"word1.txt"の読み込み
+	std::vector<std::string> word1;
+	FILE *wordfile1 = fopen ("../tfidf/word1.txt", "r");
+	while (fgets(buf, sizeof(buf), wordfile1)) {
+        std::string ptr = buf;
+        ptr=ptr.erase(ptr.find_last_not_of("\n")+1);
+		word1.push_back(ptr);
 //		weight.push_back(1-atof(ptr));
 	}
-	fclose(entfile);
-	fprintf(stderr,"entropy.txt read\n");
-	
-	//"dic.txt"の読み込み
+	fclose(wordfile1);
+	fprintf(stderr,"word1.txt read\n");
+*/
+
+    //"word2.txt"の読み込み
+
+
+    //"word1.txt"の読み込み
+	std::map<std::string, double> word1;
+	FILE *wordfile = fopen ("../../tfidf/word1_hypertest.txt", "r");
+	double gsd;
+	char *keyword;
+	while (fgets(buf, sizeof(buf), wordfile)) {
+		char *ptr1 = buf;
+		keyword= strtok(ptr1,"\t");
+		gsd = atof(strtok(NULL,"\n"));
+		word1.insert(std::map<std::string, double>::value_type(keyword, gsd));
+
+	}
+	fclose(wordfile);
+	fprintf(stderr,"word1_hypertrain.txt read\n");
+
+
+
+
+	//"500dic.txt"の読み込み
 	std::map<std::string, int> tag;
 	FILE *dicfile = fopen ("../../tfidf/dic.txt", "r");
 	int id;
@@ -37,11 +62,11 @@ int main(int argc,char *argv[])
 	}
 	fclose(dicfile);
 	fprintf(stderr,"dic.txt read\n");
-	
 
-	//"s.txt"の読み込み
+
+	/*//"s.txt"の読み込み
 	std::vector<double> s;
-	FILE *sfile = fopen ("../../tfidf/s.txt", "r");
+	FILE *sfile = fopen ("../tfidf/s.txt", "r");
 	i=0;
 	while (fgets(buf, sizeof(buf), sfile) && (i < DIM)) {
 		char *ptr = buf;
@@ -65,7 +90,7 @@ int main(int argc,char *argv[])
 
 	//"u.txt"の読み込み
 	std::vector<double *> u;
-	FILE *ufile = fopen ("../../tfidf/u.txt", "r");
+	FILE *ufile = fopen ("../tfidf/u.txt", "r");
 	while (fgets(buf, sizeof(buf), ufile)) {
 		double *tmp = new double [DIM];
 		char *ptr = buf;
@@ -84,18 +109,20 @@ int main(int argc,char *argv[])
 	}
 	fclose(ufile);
 	fprintf(stderr,"u.txt read\n");
+     */
 
 	//ここからいつもどおり
 	int att_num;
 
 	std::string str;
 
-	std::vector<std::string> context;
+	std::map<std::string,std::string> context;
 
 	std::vector<std::vector<std::vector<int> > > templ;
 	std::vector<std::vector<int> > t;
+    std::map <std::string,std::string>::iterator it1;
 	std::vector<int> nums;
-	
+
 	std::vector<confusion_network> training_cn;
 	confusion_network cn;
 	confusion_set cs;
@@ -103,11 +130,12 @@ int main(int argc,char *argv[])
 	std::map<std::string,double> feature_list;
 
 	std::map<std::string,double>::iterator itr;
-	
+
 	char* cnfilename = argv[1];
 	char* outfilename = argv[2];
 
 	std::ofstream outfs(outfilename);
+    std::ofstream testfile("testpair.txt",std::ios::app);
 
 	//学習データの読み込み
 	std::ifstream cnfs(cnfilename);
@@ -149,42 +177,76 @@ int main(int argc,char *argv[])
 	for(int i = 0; i < (int)training_cn.size(); i++){
 		//コンテキストの単語を取得
 		context.clear();
-		
+
 		//窓幅
 		for(int j = i - 3; j <= i - 1; j++){
 			if(j >= 0){
 				//training_cn[j].get_context(context,tag);
 				for(int g = 0; g < (int)(training_cn[j].get_size()); g++){
 					std::string bw = (training_cn[j].cn)[g].get_word_at(0);
+                    bool label = (training_cn[j].cn)[g].get_label_at(0);
+
 					if(tag.find(bw) != tag.end()){
-						context.push_back(bw);
+                        //cout<<bw<<endl;
+                        int num=tag[bw];
+                        /*if (num>9483) {
+                            ostringstream os;;
+                           // cout<<"before"<<bw<<endl;
+                            os<<"echo"<<" "<<bw<<"|mecab -F \"%f[6]\" -E \" \" ";
+                            //cout<<os.str()<<endl;
+                             //int temp=system(os.str().c_str());
+                            char* cstr =new char[os.str().length()+1];
+                            strcpy(cstr,os.str().c_str());
+                            bw=exec(cstr);
+                           //cout<<"exstatus is:"<<  tem <<endl;
+                        }*/
+                        std::stringstream ss;
+                        ss << j <<","<<g;
+                        std::string key=ss.str();
+                       // std::cout<<key<<endl;
+						context.insert(std::map <std::string, std::string>::value_type(key, bw));
 					}
 				}
 			}
 		}
 		//窓幅
-		for(int j = i + 1; j <= i + 3; j++){
+		for(int j = i ; j <= i + 3; j++){
 			if(j < (int)training_cn.size()){
 				//training_cn[j].get_context(context,tag);
 				for(int g = 0; g < (int)(training_cn[j].get_size()); g++){
 					std::string bw = (training_cn[j].cn)[g].get_word_at(0);
-					if(tag.find(bw) != tag.end()){
-						context.push_back(bw);
+                    bool label = (training_cn[j].cn)[g].get_label_at(0);
+
+                    if(tag.find(bw) != tag.end()){
+                        int num=tag[bw];
+                        //if(num>9483){
+                          //  ostringstream os;
+
+                            //os<<"echo"<<" "<<bw<<"|mecab -F \"%f[6]\" -E \" \" ";
+                            //char* cstr =new char[os.str().length()+1];
+                            //strcpy(cstr,os.str().c_str());
+                            //bw=exec(cstr);
+                        //}
+                        std::stringstream ss;
+                        ss << j<< ","<<g;
+                        std::string key=ss.str();
+                        //std::cout<<key<<endl;
+						context.insert(std::map <std::string , std::string>::value_type(key, bw));
 					}
 				}
 			}
 		}
 
-//		for(int j = 0; j < (int)context.size(); j++){
-//			std::cerr << context[j] << " ";
-//		}
-//		std::cerr << std::endl;
+        //for( it1= context.begin(); it1!=context.end(); it1++){
+		//	std::cout << (*it1).second << " ";
+		//}
+		//std::cerr << std::endl;
 		std::string best = training_cn[i].best_hyp();
 		if(best == "cn_failed "){
 			outfs << "cn_failed \n\n";
 		}
 		else{
-			training_cn[i].semantic_scoring(context,idf,tag,s,u);
+			training_cn[i].semantic_scoring(i,context,word1,tag,testfile);
 			training_cn[i].out_sem_perceptron_data(outfs);
 		}
 		std::cerr << i << "\r";
@@ -192,6 +254,7 @@ int main(int argc,char *argv[])
 
 	cnfs.close();
 	outfs.close();
+    testfile.close();
 	std::cerr << std::endl;
 
 	return 0;
@@ -211,4 +274,16 @@ std::vector<std::string> split(std::string str, std::string delim){
         result.push_back(str);
     }
 	return result;
+}
+std::string exec(char *cmd) {
+    FILE* pipe = popen(cmd, "r");
+    if (!pipe) return "ERROR";
+    char buffer[128];
+    std::string result = "";
+    while(!feof(pipe)) {
+    	if(fgets(buffer, 128, pipe) != NULL)
+    		result += buffer;
+    }
+    pclose(pipe);
+    return result;
 }

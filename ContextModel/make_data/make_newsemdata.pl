@@ -14,6 +14,6 @@ foreach(@cnfile){
 		$sem_cn = "$semcndir/$_";
 		print "make $sem_cn\n";
 		# `./semantic $cn $sem_cn`;
-		`./semantic_csjnrd $cn $sem_cn`;
+		`./semantic_csjnwd_train $cn $sem_cn`;
 	}
 }

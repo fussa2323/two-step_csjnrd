@@ -2,7 +2,8 @@
 
 $cndir = "make_data/new_semantic_cn";
 
-$cncrftrain = "sem_cncrftrain_csjnrd.txt";
+$cncrftrain = "sem_cncrftrain_csjnwd.txt";
+# $cncrftrain = "sem_cncrftrain_csjnwd_test.txt";
 
 opendir(CNDIR,"$cndir");
 @file = readdir(CNDIR);

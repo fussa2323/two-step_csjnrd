@@ -9,6 +9,7 @@
 #include <climits>
 #include <cfloat>
 #include <cstdlib>
+#include <algorithm>
 
 #include "confusion_set.h"
 
@@ -31,7 +32,8 @@ public:
 	void out_perceptron_data(std::ofstream&);			//パーセプトロンの学習用のデータを出力
 	void out_sem_perceptron_data(std::ofstream&);						//意味スコア付きCNをファイルに出力
 	void get_context(std::vector<std::string>&, std::map<std::string, int>);	//コンテキスト単語の取得
-	void semantic_scoring(std::vector<std::string>, std::vector<double>, std::map<std::string, int>, std::vector<double>, std::vector<double *>);	//意味スコアの計算
+	void semantic_scoring(int,std::map<std::string,std::string>, std::map<std::string,double>, std::map<std::string, int>,std::ofstream&);	//意味スコアの計算
+   
 	void culc_weight(std::map<std::string,double>&, std::vector<std::vector<std::vector<int> > >);	//重みの計算
 	void culc_score(std::map<std::string,double>&, std::vector<std::vector<std::vector<int> > >,double);	//スコアが最大の単語を選択していく
 public:

@@ -5,7 +5,7 @@
 $testdir = "test_data";
 $outdir = "out_back";
 
-$model = "ContextModel/Semmodel";
+$model = "ContextModel/Semmodel_csjnwd";
 
 opendir(TESTDIR,"$testdir");
 @testfile = readdir(TESTDIR);

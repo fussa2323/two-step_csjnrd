@@ -10,10 +10,10 @@
 # ./ErrorDetection.pl
 # ./all_correct.pl
 cd make_data
-./make_newcn.pl
+# ./make_newcn.pl
 ./make_newsemdata.pl
 cd ../
 ./make_traindata.pl
 # ../../CRF_0.57/bin/crf_learn -p 1 SemTemplate.txt sem_cncrftrain.txt Semmodel
-# ../../CRF_0.57/bin/crf_learn -p 1 SemTemplate.txt sem_cncrftrain.txt Semmodel_csjnrd
-../../CRF_0.57/bin/crf_learn -p 1 SemTemplate.txt sem_cncrftrain_csjnrd.txt Semmodel_csjnrd
+../../CRF_0.57/bin/crf_learn -p 1 SemTemplate.txt sem_cncrftrain_csjnwd.txt Semmodel_csjnwd
+
